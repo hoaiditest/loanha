@@ -3,6 +3,10 @@
    Author: Minh Đỗ (Senior UI/UX Designer & Frontend Developer)
    ========================================================================== */
 
+// CẤU HÌNH: Dán URL ứng dụng web Google Apps Script của bạn vào đây để lưu dữ liệu và nhận thông báo Telegram.
+// Ví dụ: "https://script.google.com/macros/s/AKfycbz..."
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqt1ApVif_CuyJUcyjK-SShY-k-aGNBp59ifkW3hEvDaU9bgMxHIoOoLYm-CQgvdtP/exec";
+
 document.addEventListener('DOMContentLoaded', () => {
     
     /* --------------------------------------------------------------------------
@@ -263,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Form Submit Event
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         // Validate all fields
@@ -288,30 +292,53 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtnText.style.display = 'none';
             submitBtnSpinner.style.display = 'inline-block';
             
-            // Simulate API transmission with timeout (1.5 seconds)
-            setTimeout(() => {
-                // Console log the form data exactly as requested
-                console.log('--- YÊU CẦU ĐẶT DỊCH VỤ MỚI ---');
-                console.log(JSON.stringify(formData, null, 2));
-                console.log('--------------------------------');
-                
-                // Show Custom Toast success notification
-                showToast('Yêu cầu đã được gửi thành công! Loan Hà sẽ liên hệ lại ngay trong 15 phút.');
-                
-                // Reset form fields
-                contactForm.reset();
-                
-                // Re-enable button & Restore text
-                submitBtn.disabled = false;
-                submitBtnText.style.display = 'inline-block';
-                submitBtnSpinner.style.display = 'none';
-                
-                // Remove error classes (since fields are now empty)
-                document.querySelectorAll('.form-group').forEach(group => {
-                    group.classList.remove('has-error');
-                });
-                
-            }, 1500);
+            if (!GOOGLE_SCRIPT_URL) {
+                // CHẾ ĐỘ MÔ PHỎNG (Khi chưa cấu hình URL Google Script)
+                setTimeout(() => {
+                    console.log('--- YÊU CẦU ĐẶT DỊCH VỤ MỚI (MÔ PHỎNG) ---');
+                    console.log(JSON.stringify(formData, null, 2));
+                    console.log('--------------------------------');
+                    
+                    showToast('Yêu cầu đã được gửi thành công! (Chế độ mô phỏng - Chưa cấu hình Google Script)');
+                    
+                    contactForm.reset();
+                    submitBtn.disabled = false;
+                    submitBtnText.style.display = 'inline-block';
+                    submitBtnSpinner.style.display = 'none';
+                    
+                    document.querySelectorAll('.form-group').forEach(group => {
+                        group.classList.remove('has-error');
+                    });
+                }, 1500);
+            } else {
+                // CHẾ ĐỘ THỰC TẾ: Gửi dữ liệu tới Google Apps Script
+                try {
+                    const response = await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors', // Cần thiết đối với Google Script web app khi chuyển hướng
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    // Do mode 'no-cors' không trả về dữ liệu phản hồi chi tiết từ client (opaque response),
+                    // chúng ta giả định nếu không ném ra ngoại lệ (exception) thì kết nối đã truyền dữ liệu thành công.
+                    showToast('Yêu cầu đã được gửi thành công! Loan Hà sẽ liên hệ lại ngay trong 15 phút.');
+                    contactForm.reset();
+                    
+                    document.querySelectorAll('.form-group').forEach(group => {
+                        group.classList.remove('has-error');
+                    });
+                } catch (error) {
+                    console.error('Lỗi gửi form:', error);
+                    showToast('Đã có lỗi xảy ra khi gửi yêu cầu. Vui lòng liên hệ trực tiếp qua Zalo/Hotline.', 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtnText.style.display = 'inline-block';
+                    submitBtnSpinner.style.display = 'none';
+                }
+            }
             
         } else {
             // Scroll to the first error
