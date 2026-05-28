@@ -1,0 +1,24 @@
+{
+  "name": "loan-ha-camera-landing-page",
+  "version": "1.0.0",
+  "description": "Landing Page chuyên nghiệp cho cửa hàng Loan Hà Camera & Vi Tính",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx -y http-server ./ -p 3000",
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui",
+    "test:codegen": "npx playwright codegen http://localhost:3000"
+  },
+  "keywords": [
+    "landing-page",
+    "camera",
+    "vi-tinh",
+    "loan-ha",
+    "playwright"
+  ],
+  "author": "Minh Đỗ",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.43.0"
+  }
+}
