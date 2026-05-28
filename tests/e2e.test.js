@@ -48,7 +48,7 @@ test.describe('LOAN HÀ CAMERA & VI TÍNH - E2E Testing & Verification', () => {
         // 5. Test Click CTA Hotline và Zalo (kiểm tra thuộc tính href)
         console.log('Checking call action buttons...');
         const callBtn = page.locator('a.btn-phone-cta');
-        await expect(callBtn).toHaveAttribute('href', 'tel:0971174225');
+        await expect(callBtn).toHaveAttribute('href', 'tel:0969448035');
         const zaloBtn = page.locator('a.btn-zalo-cta');
         await expect(zaloBtn).toHaveAttribute('href', /zalo/);
 
